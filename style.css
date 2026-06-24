@@ -6,7 +6,7 @@
 }
 
 :root {
-    /* Color Palette variables */
+    /* Color Palette variables - Theme 1: Classic */
     --dark-navy: #293241;
     --dark-blue: #3d5a80;
     --light-blue: #98c1d9;
@@ -26,6 +26,67 @@
     --border-radius-main: 24px;
     --border-radius-btn: 14px;
     --border-radius-display: 16px;
+
+    /* Theme Select Panel variables */
+    --panel-bg: rgba(41, 50, 65, 0.4);
+    --panel-border: rgba(152, 193, 217, 0.15);
+    --panel-text: #ffffff;
+    --theme-active-bg: rgba(152, 193, 217, 0.25);
+    
+    /* Buttons Custom Overrides */
+    --calc-border: rgba(152, 193, 217, 0.1);
+    --btn-num-hover: #4a6a92;
+    --btn-num-text: var(--very-light-cyan);
+    --btn-op-hover: #f07d62;
+    --btn-clear-hover: #a9cfde;
+    --btn-equals-bg: var(--orange);
+    --btn-equals-hover-bg: #f07d62;
+    --btn-equals-shadow: rgba(238, 108, 77, 0.35);
+    --btn-equals-hover-shadow: rgba(238, 108, 77, 0.5);
+    --display-border: rgba(255, 255, 255, 0.5);
+    --display-text-prev: rgba(41, 50, 65, 0.6);
+
+    /* Body Background Style */
+    --body-bg: radial-gradient(circle at top right, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    --body-bg-size: auto;
+    --body-bg-pos: auto;
+}
+
+/* Theme 2: Star Wars Theme */
+body[data-theme="star-wars"] {
+    --dark-navy: #121212;
+    --dark-blue: #222222;
+    --light-blue: #00bcff; /* Lightsaber blue */
+    --very-light-cyan: #050505;
+    --orange: #ffe81f; /* Star Wars logo yellow */
+    
+    /* UI Overrides */
+    --body-text-dark: #39ff14; /* Sci-fi glowing green */
+    --panel-bg: rgba(18, 18, 18, 0.75);
+    --panel-border: #ffe81f;
+    --panel-text: #ffe81f;
+    --theme-active-bg: rgba(255, 232, 31, 0.2);
+
+    --calc-border: #ffe81f; /* Neon yellow outline */
+    --btn-num-hover: #333333;
+    --btn-num-text: #ffe81f;
+    --btn-op-hover: #fff37a;
+    --btn-clear-hover: #54d2ff;
+    --btn-equals-bg: #ff003c; /* Lightsaber red */
+    --btn-equals-hover-bg: #ff2a57;
+    --btn-equals-shadow: rgba(255, 0, 60, 0.45);
+    --btn-equals-hover-shadow: rgba(255, 0, 60, 0.75);
+    --display-border: #39ff14; /* Targeting display green outline */
+    --display-text-prev: rgba(57, 255, 20, 0.55);
+
+    /* Starry Stardust Space Background */
+    --body-bg: 
+        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+        linear-gradient(to bottom, #000000 0%, #0d0e12 100%);
+    --body-bg-size: 550px 550px, 350px 350px, 250px 250px, 100% 100%;
+    --body-bg-pos: 0 0, 40px 60px, 130px 270px, 0 0;
 }
 
 body {
@@ -34,17 +95,108 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at top right, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    background: var(--body-bg);
+    background-size: var(--body-bg-size);
+    background-position: var(--body-bg-pos);
     padding: 20px;
     color: #ffffff;
+    transition: background var(--transition-speed) ease;
 }
 
-/* Calculator Outer Container */
+/* Master Layout Grid (Theme Selector + Calculator) */
+.app-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 620px;
+}
+
+/* Sidebar Theme Panel */
+.theme-panel {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--border-radius-main);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 190px;
+    box-shadow: var(--box-shadow-main);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all var(--transition-speed) ease;
+}
+
+.theme-panel-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--panel-text);
+    text-align: center;
+}
+
+.theme-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.theme-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-btn);
+    color: var(--panel-text);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all var(--transition-speed) ease;
+    width: 100%;
+    text-align: left;
+    outline: none;
+}
+
+.theme-btn:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.theme-btn.active {
+    background-color: var(--theme-active-bg);
+    border-color: var(--panel-border);
+    font-weight: 600;
+}
+
+/* Theme previews circles */
+.theme-color-preview {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.preview-classic {
+    background: linear-gradient(135deg, #3d5a80 50%, #ee6c4d 50%);
+}
+
+.preview-star-wars {
+    background: linear-gradient(135deg, #121212 50%, #ffe81f 50%);
+    border-color: #ffe81f;
+}
+
+/* Calculator Container */
 .calculator-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    flex: 1;
 }
 
 .calculator {
@@ -54,7 +206,13 @@ body {
     border-radius: var(--border-radius-main);
     padding: 24px;
     box-shadow: var(--box-shadow-main);
-    border: 1px solid rgba(152, 193, 217, 0.1); /* Glassmorphic outline */
+    border: 1px solid var(--calc-border);
+    transition: all var(--transition-speed) ease;
+}
+
+/* Theme overrides for glowing visual accents */
+body[data-theme="star-wars"] .calculator {
+    box-shadow: 0 0 30px rgba(255, 232, 31, 0.2);
 }
 
 /* Display Screen */
@@ -65,21 +223,28 @@ body {
     margin-bottom: 24px;
     text-align: right;
     box-shadow: var(--box-shadow-inset);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--display-border);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 120px;
+    transition: all var(--transition-speed) ease;
+}
+
+body[data-theme="star-wars"] .display {
+    box-shadow: inset 0 4px 12px rgba(57, 255, 20, 0.15);
+    text-shadow: 0 0 6px rgba(57, 255, 20, 0.3);
 }
 
 .previous-operand {
-    color: rgba(41, 50, 65, 0.6);
+    color: var(--display-text-prev);
     font-size: 1rem;
     font-weight: 400;
     min-height: 24px;
     word-wrap: break-word;
     word-break: break-all;
     letter-spacing: 0.5px;
+    transition: color var(--transition-speed) ease;
 }
 
 .current-operand {
@@ -92,7 +257,7 @@ body {
     line-height: 1.2;
     margin-top: 8px;
     letter-spacing: -0.5px;
-    transition: font-size var(--transition-speed) ease;
+    transition: font-size var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 /* Buttons Grid Layout */
@@ -124,7 +289,7 @@ body {
     grid-column: span 2;
 }
 
-/* Button Click/Active State: Physical tactile feedback */
+/* Button Click/Active State */
 .btn:active {
     transform: scale(0.94);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -133,23 +298,33 @@ body {
 /* 1. Numbers Button Styling */
 .btn-number {
     background-color: var(--dark-blue);
-    color: var(--very-light-cyan);
+    color: var(--btn-num-text);
 }
 
 .btn-number:hover {
-    background-color: #4a6a92;
+    background-color: var(--btn-num-hover);
     color: #ffffff;
+}
+
+body[data-theme="star-wars"] .btn-number:hover {
+    color: var(--orange);
+    text-shadow: 0 0 5px rgba(255, 232, 31, 0.5);
+    box-shadow: 0 0 10px rgba(255, 232, 31, 0.25);
 }
 
 /* 2. Operators Button Styling */
 .btn-operator {
     background-color: var(--orange);
-    color: #ffffff;
+    color: var(--dark-navy);
+}
+
+body[data-theme="star-wars"] .btn-operator {
+    color: #000000;
 }
 
 .btn-operator:hover {
-    background-color: #f07d62;
-    box-shadow: 0 4px 12px rgba(238, 108, 77, 0.25);
+    background-color: var(--btn-op-hover);
+    box-shadow: 0 4px 12px var(--btn-equals-shadow);
 }
 
 /* 3. Clear and Delete Button Styling */
@@ -159,27 +334,117 @@ body {
     color: var(--dark-navy);
 }
 
+body[data-theme="star-wars"] .btn-clear,
+body[data-theme="star-wars"] .btn-delete {
+    color: #000000;
+    box-shadow: 0 0 10px rgba(0, 188, 255, 0.2);
+}
+
 .btn-clear:hover,
 .btn-delete:hover {
-    background-color: #a9cfde;
+    background-color: var(--btn-clear-hover);
     box-shadow: 0 4px 12px rgba(152, 193, 217, 0.25);
+}
+
+body[data-theme="star-wars"] .btn-clear:hover,
+body[data-theme="star-wars"] .btn-delete:hover {
+    box-shadow: 0 0 15px rgba(0, 188, 255, 0.5);
 }
 
 /* 4. Equals Button Styling (Visually Prominent) */
 .btn-equals {
-    background-color: var(--orange);
+    background-color: var(--btn-equals-bg);
     color: #ffffff;
     font-size: 1.5rem;
     font-weight: 700;
-    box-shadow: 0 4px 15px rgba(238, 108, 77, 0.35);
+    box-shadow: var(--btn-equals-shadow);
+}
+
+body[data-theme="star-wars"] .btn-equals {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
 .btn-equals:hover {
-    background-color: #f07d62;
-    box-shadow: 0 6px 20px rgba(238, 108, 77, 0.5);
+    background-color: var(--btn-equals-hover-bg);
+    box-shadow: var(--btn-equals-hover-shadow);
 }
 
-/* Responsive adjustments for mobile screens */
+/* Star Wars Character Floating Animation Element */
+.pop-character {
+    position: absolute;
+    pointer-events: none;
+    font-size: 2.4rem; /* increased size for better visibility */
+    font-weight: bold;
+    z-index: 1000;
+    animation: moveRandom 5s cubic-bezier(0.25, 1, 0.5, 1) forwards; /* travel randomly across screen */
+    text-shadow: 0 0 8px rgba(255, 232, 31, 0.8), 0 0 20px rgba(255, 232, 31, 0.4);
+    user-select: none;
+}
+
+@keyframes floatUpWander {
+    0% {
+        transform: translate(-50%, -50%) translateY(0) translateX(0) scale(0.6) rotate(0deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(-12px) translateX(-8px) scale(1.3) rotate(-15deg);
+    }
+    50% {
+        transform: translate(-50%, -50%) translateY(-40px) translateX(8px) scale(1) rotate(5deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) translateY(-75px) translateX(0) scale(0.8) rotate(15deg);
+        opacity: 0;
+    }
+}
+
+/* Random travel animation using CSS variables */
+@keyframes moveRandom {
+  0% {
+    transform: translate(-50%, -50%) translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateX(var(--dx)) translateY(var(--dy));
+    opacity: 0;
+  }
+}
+
+/* Responsive adjustments for mobile and tablets */
+@media (max-width: 650px) {
+    .app-layout {
+        flex-direction: column;
+        gap: 20px;
+        max-width: 380px;
+    }
+    
+    .theme-panel {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        gap: 10px;
+    }
+    
+    .theme-panel-title {
+        margin-bottom: 0;
+        text-align: left;
+    }
+    
+    .theme-options {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .theme-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        width: auto;
+    }
+}
+
 @media (max-width: 400px) {
     .calculator {
         padding: 16px;

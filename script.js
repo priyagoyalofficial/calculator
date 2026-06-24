@@ -1,6 +1,6 @@
 /**
  * Modern Responsive Calculator App Logic
- * Designed with a clean state machine and robust input validation.
+ * Designed with a clean state machine, input validation, and multi-theme support.
  */
 
 class Calculator {
@@ -22,7 +22,6 @@ class Calculator {
 
     /**
      * Deletes the last entered character from the current input.
-     * If the length is 1, it resets the value to '0'.
      */
     delete() {
         if (this.isErrorState()) {
@@ -30,7 +29,6 @@ class Calculator {
             return;
         }
 
-        // If screen was just computed, a delete acts as a clear
         if (this.shouldResetScreen) {
             this.clear();
             return;
@@ -46,18 +44,15 @@ class Calculator {
     }
 
     /**
-     * Appends a number or decimal point to the current operand,
-     * enforcing input validation rules.
+     * Appends a number or decimal point, enforcing validation rules.
      * @param {string} number - The character to append.
      */
     appendNumber(number) {
-        // If we recently evaluated an expression, typing a new number starts a new expression
         if (this.shouldResetScreen) {
             this.currentOperand = '';
             this.shouldResetScreen = false;
         }
 
-        // Check for error state to reset
         if (this.isErrorState()) {
             this.clear();
         }
@@ -65,13 +60,13 @@ class Calculator {
         // Prevent multiple decimal points
         if (number === '.' && this.currentOperand.includes('.')) return;
 
-        // If typing decimal on empty or initial '0' state, keep the '0' and append '.'
+        // Decimal fallback
         if (number === '.' && (this.currentOperand === '0' || this.currentOperand === '')) {
             this.currentOperand = '0.';
             return;
         }
 
-        // Replace leading zero with the new number
+        // Replace leading zero
         if (this.currentOperand === '0' && number !== '.') {
             this.currentOperand = number.toString();
         } else {
@@ -81,14 +76,14 @@ class Calculator {
 
     /**
      * Selects an operator (+, -, *, /) and chains evaluations if there are pending operands.
-     * @param {string} operation - The chosen arithmetic operator.
+     * @param {string} operation - The chosen operator.
      */
     chooseOperation(operation) {
         if (this.isErrorState()) {
             this.clear();
         }
 
-        // Allow changing the operator if user makes a mistake before typing the next number
+        // Allow changing the operator if user makes a mistake
         if (this.currentOperand === '' || this.currentOperand === '0') {
             if (this.previousOperand !== '') {
                 this.operation = operation;
@@ -96,10 +91,9 @@ class Calculator {
             return;
         }
 
-        // Evaluate previous equation if there's a chain of operations (e.g. 5 + 3 * 2)
         if (this.previousOperand !== '') {
             this.compute();
-            if (this.isErrorState()) return; // Stop chaining if division by zero occurs
+            if (this.isErrorState()) return;
         }
 
         this.operation = operation;
@@ -109,14 +103,13 @@ class Calculator {
     }
 
     /**
-     * Performs the math calculation based on current state.
+     * Performs calculation based on current state.
      */
     compute() {
         let computation;
         const prev = parseFloat(this.previousOperand);
         const current = parseFloat(this.currentOperand);
 
-        // Prevent computation if operands are invalid numbers
         if (isNaN(prev) || isNaN(current)) return;
 
         switch (this.operation) {
@@ -130,7 +123,6 @@ class Calculator {
                 computation = prev * current;
                 break;
             case '/':
-                // Graceful division-by-zero handling
                 if (current === 0) {
                     this.currentOperand = 'Cannot divide by zero';
                     this.previousOperand = '';
@@ -144,7 +136,7 @@ class Calculator {
                 return;
         }
 
-        // Handle floating-point arithmetic precision (e.g., 0.1 + 0.2 = 0.3)
+        // Fix floating-point precision logic
         this.currentOperand = parseFloat(computation.toFixed(10)).toString();
         this.operation = undefined;
         this.previousOperand = '';
@@ -160,9 +152,8 @@ class Calculator {
     }
 
     /**
-     * Helper to format numbers with thousands separators for a premium feel,
-     * while retaining decimal inputs dynamically.
-     * @param {string|number} number - The raw input to format.
+     * Helper to format numbers with thousands separators.
+     * @param {string|number} number - The raw input.
      * @returns {string} The formatted number.
      */
     getDisplayNumber(number) {
@@ -177,7 +168,6 @@ class Calculator {
         if (isNaN(integerDigits)) {
             integerDisplay = '';
         } else {
-            // format standard US English representation (e.g. 1,000)
             integerDisplay = integerDigits.toLocaleString('en', { maximumFractionDigits: 0 });
         }
 
@@ -189,10 +179,9 @@ class Calculator {
     }
 
     /**
-     * Updates the calculator screen elements.
+     * Updates the screen elements.
      */
     updateDisplay() {
-        // Display current value (fallback to '0' if empty)
         if (this.currentOperand === '' && this.previousOperand === '') {
             this.currentOperandTextElement.innerText = '0';
         } else if (this.currentOperand === '' && this.operation != null) {
@@ -201,7 +190,6 @@ class Calculator {
             this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand);
         }
 
-        // Display previous expression (e.g. 5 +)
         if (this.operation != null) {
             let symbol = this.operation;
             if (symbol === '*') symbol = '×';
@@ -214,34 +202,111 @@ class Calculator {
     }
 }
 
-// Instantiate the calculator when DOM loads
+// Instantiate the calculator and bind listeners on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     const previousOperandTextElement = document.getElementById('previous-operand');
     const currentOperandTextElement = document.getElementById('current-operand');
+    const themePanel = document.getElementById('theme-panel');
     
     const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
 
-    // Click handler for all button clicks
+    // Initialize and persist themes
+    const savedTheme = localStorage.getItem('calculator-theme') || 'classic';
+    applyTheme(savedTheme);
+
+    // Click handler for theme panel
+    themePanel.addEventListener('click', (e) => {
+        const themeBtn = e.target.closest('[data-theme-select]');
+        if (!themeBtn) return;
+
+        const selectedTheme = themeBtn.getAttribute('data-theme-select');
+        applyTheme(selectedTheme);
+    });
+
+    /**
+     * Sets document attributes, active button styles, and local storage values for selected theme.
+     * @param {string} themeName - Name of the theme to apply.
+     */
+    function applyTheme(themeName) {
+        if (themeName === 'star-wars') {
+            document.body.setAttribute('data-theme', 'star-wars');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+
+        // Set local storage
+        localStorage.setItem('calculator-theme', themeName);
+
+        // Update active class state on theme switcher buttons
+        document.querySelectorAll('[data-theme-select]').forEach(btn => {
+            if (btn.getAttribute('data-theme-select') === themeName) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    /**
+     * Spawns a floating Star Wars emoji/character at the center of the clicked/triggered button.
+     * Only triggers when the Star Wars theme is active.
+     * @param {HTMLElement} btnElement - The HTML element representing the button.
+     */
+    function spawnStarWarsCharacter(btnElement) {
+        if (document.body.getAttribute('data-theme') !== 'star-wars') return;
+
+        // Classic Star Wars Emojis/Characters
+        const starWarsChars = ['👽', '🤖', '🛸', '🌑', '👤', '⚔️', '🪐', '🚀', '⭐', '💥'];
+        const randomChar = starWarsChars[Math.floor(Math.random() * starWarsChars.length)];
+
+        const characterElement = document.createElement('div');
+        characterElement.classList.add('pop-character');
+        characterElement.innerText = randomChar;
+
+        // Position at the center of the clicked button
+        const rect = btnElement.getBoundingClientRect();
+        const x = rect.left + window.scrollX + rect.width / 2;
+        const y = rect.top + window.scrollY + rect.height / 2;
+        characterElement.style.left = `${x}px`;
+        characterElement.style.top = `${y}px`;
+
+        // Random travel offsets for the animation (relative to start)
+        const dx = (Math.random() - 0.5) * window.innerWidth; // can be negative or positive
+        const dy = (Math.random() - 0.5) * window.innerHeight;
+        characterElement.style.setProperty('--dx', `${dx}px`);
+        characterElement.style.setProperty('--dy', `${dy}px`);
+
+        document.body.appendChild(characterElement);
+
+        // Clean up after animation completes (5s)
+        setTimeout(() => {
+            characterElement.remove();
+        }, 5000);
+    }
+
+    // Click handler for calculator buttons
     const buttonsGrid = document.querySelector('.buttons-grid');
     buttonsGrid.addEventListener('click', (e) => {
         const target = e.target;
         
-        // Ensure we clicked a button, not the grid gap
         if (!target.classList.contains('btn')) return;
 
-        // Number Buttons
+        // Spawn character particle if Star Wars theme is active
+        spawnStarWarsCharacter(target);
+
+        // Numbers and Decimal
         if (target.dataset.number !== undefined) {
             calculator.appendNumber(target.dataset.number);
             calculator.updateDisplay();
         }
 
-        // Operator Buttons
+        // Operators
         if (target.dataset.operator !== undefined) {
             calculator.chooseOperation(target.dataset.operator);
             calculator.updateDisplay();
         }
 
-        // Special Action Buttons
+        // Actions (clear, delete, equals)
         if (target.dataset.action !== undefined) {
             const action = target.dataset.action;
             if (action === 'clear') {
@@ -255,79 +320,51 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Keyboard support for enhanced accessibility and UX
+    // Keyboard support
     document.addEventListener('keydown', (e) => {
         let key = e.key;
+        let selector = '';
 
-        // Map operator keys
         if (key === '/') {
-            e.preventDefault(); // Prevents browser search
+            e.preventDefault();
             calculator.chooseOperation('/');
+            selector = '#btn-divide';
         } else if (key === '*') {
             calculator.chooseOperation('*');
+            selector = '#btn-multiply';
         } else if (key === '-') {
             calculator.chooseOperation('-');
+            selector = '#btn-subtract';
         } else if (key === '+') {
             calculator.chooseOperation('+');
-        } 
-        // Map numbers and decimal
-        else if ((key >= '0' && key <= '9') || key === '.') {
+            selector = '#btn-add';
+        } else if ((key >= '0' && key <= '9') || key === '.') {
             calculator.appendNumber(key);
-        } 
-        // Map enter and equals key to compute
-        else if (key === 'Enter' || key === '=') {
+            selector = `button[data-number="${key}"]`;
+        } else if (key === 'Enter' || key === '=') {
             e.preventDefault();
             calculator.compute();
-        } 
-        // Map delete
-        else if (key === 'Backspace') {
+            selector = '#btn-equals';
+        } else if (key === 'Backspace') {
             calculator.delete();
-        } 
-        // Map clear (AC) to Escape
-        else if (key === 'Escape') {
+            selector = '#btn-delete';
+        } else if (key === 'Escape') {
             calculator.clear();
+            selector = '#btn-clear';
         } else {
-            // Ignore other keypresses
-            return;
+            return; // Ignore other keys
         }
 
         calculator.updateDisplay();
         
-        // Add active state styling to visual buttons on keypress
-        highlightPressedButton(key);
-    });
-
-    /**
-     * Briefly applies a visual press effect on the calculator button matching the keyboard key.
-     * @param {string} key - The key pressed.
-     */
-    function highlightPressedButton(key) {
-        let selector = '';
-        if (key >= '0' && key <= '9') {
-            selector = `button[data-number="${key}"]`;
-        } else if (key === '.') {
-            selector = 'button[data-number="."]';
-        } else if (key === '/') {
-            selector = '#btn-divide';
-        } else if (key === '*') {
-            selector = '#btn-multiply';
-        } else if (key === '-') {
-            selector = '#btn-subtract';
-        } else if (key === '+') {
-            selector = '#btn-add';
-        } else if (key === 'Enter' || key === '=') {
-            selector = '#btn-equals';
-        } else if (key === 'Backspace') {
-            selector = '#btn-delete';
-        } else if (key === 'Escape') {
-            selector = '#btn-clear';
-        }
-
+        // Highlight visual keys and trigger Star Wars characters for keyboard events
         if (selector) {
             const btn = document.querySelector(selector);
             if (btn) {
-                btn.classList.add('active-keyboard');
-                // Temporary stylesheet insertion for the active styling, or just set transform/scale directly
+                // Spawn character pop-up
+                spawnStarWarsCharacter(btn);
+
+                // Add transient keyboard active styling
                 btn.style.transform = 'scale(0.94)';
                 btn.style.filter = 'brightness(0.9)';
                 setTimeout(() => {
@@ -336,5 +373,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 100);
             }
         }
-    }
+    });
 });
