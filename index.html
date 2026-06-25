@@ -13,17 +13,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-layout">
-        <!-- Floating Theme Selector Sidebar -->
+    <div class="main-wrapper">
         <aside class="theme-panel" id="theme-panel">
             <h2 class="theme-panel-title">THEMES</h2>
             <div class="theme-options">
-                <!-- Theme 1 Button -->
                 <button class="theme-btn active" data-theme-select="classic" aria-label="Switch to Classic Theme">
                     <span class="theme-color-preview preview-classic"></span>
                     Classic
                 </button>
-                <!-- Theme 2 Button -->
                 <button class="theme-btn" data-theme-select="star-wars" aria-label="Switch to Star Wars Theme">
                     <span class="theme-color-preview preview-star-wars"></span>
                     Star Wars
@@ -74,9 +71,23 @@
                 </div>
             </div>
         </main>
+        <button id="like-button" class="like-btn" aria-label="Like">
+            <span class="like-label">Like</span>
+            <span class="heart">♡</span>
+            <span class="counter" id="like-count">—</span>
+        </button>
     </div>
+    <footer class="footer">
+        <div class="social-links">
+            <a href="https://github.com/priyagoyalofficial" target="_blank" rel="noopener" class="social-link">
+                <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="24" height="24">
+            </a>
+            <a href="https://www.linkedin.com/in/priyagoyal27/" target="_blank" rel="noopener" class="social-link">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" alt="LinkedIn" width="24" height="24">
+            </a>
+        </div>
+    </footer>
 
-    <!-- Link to calculator logic -->
     <script src="script.js"></script>
 </body>
 </html>

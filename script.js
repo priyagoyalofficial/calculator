@@ -374,4 +374,63 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    // Shared like counter via countapi.xyz (localStorage fallback)
+    const COUNTER_NS = 'priya-calculator-app';
+    const COUNTER_KEY = 'heart-likes';
+    const COUNTER_BASE = 'https://api.countapi.xyz';
+    const likeBtn = document.getElementById('like-button');
+    const likeCountEl = document.getElementById('like-count');
+    const heartEl = likeBtn.querySelector('.heart');
+
+    async function fetchCount() {
+        try {
+            const res = await Promise.race([
+                fetch(`${COUNTER_BASE}/get/${COUNTER_NS}/${COUNTER_KEY}`),
+                new Promise((_, reject) => setTimeout(() => reject('timeout'), 4000))
+            ]);
+            const data = await res.json();
+            const val = parseInt(data.value);
+            if (!isNaN(val)) localStorage.setItem('like-count', val);
+            return isNaN(val) ? parseInt(localStorage.getItem('like-count') || '0') : val;
+        } catch {
+            return parseInt(localStorage.getItem('like-count') || '0');
+        }
+    }
+
+    async function incrementCount() {
+        try {
+            const res = await fetch(`${COUNTER_BASE}/hit/${COUNTER_NS}/${COUNTER_KEY}`);
+            const data = await res.json();
+            localStorage.setItem('like-count', data.value);
+            return data.value;
+        } catch {
+            const count = parseInt(localStorage.getItem('like-count') || '0') + 1;
+            localStorage.setItem('like-count', count);
+            return count;
+        }
+    }
+
+    // Restore liked state on load
+    if (localStorage.getItem('heart-liked') === 'true') {
+        likeBtn.classList.add('liked');
+        heartEl.textContent = '♥';
+    }
+
+    // Show cached count immediately, then refresh from shared API
+    likeCountEl.textContent = localStorage.getItem('like-count') || '0';
+    fetchCount().then(count => { likeCountEl.textContent = count; });
+
+    likeBtn.addEventListener('click', async () => {
+        const wasLiked = likeBtn.classList.contains('liked');
+        likeBtn.classList.toggle('liked');
+        if (!wasLiked) {
+            heartEl.textContent = '♥';
+            localStorage.setItem('heart-liked', 'true');
+            const newCount = await incrementCount();
+            likeCountEl.textContent = newCount;
+        } else {
+            heartEl.textContent = '♡';
+            localStorage.setItem('heart-liked', 'false');
+        }
+    });
 });

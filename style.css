@@ -93,8 +93,9 @@ body {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     background: var(--body-bg);
     background-size: var(--body-bg-size);
     background-position: var(--body-bg-pos);
@@ -104,14 +105,58 @@ body {
 }
 
 /* Master Layout Grid (Theme Selector + Calculator) */
-.app-layout {
+
+/* Main wrapper for theme panel and calculator */
+.main-wrapper {
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: center;
-    gap: 30px;
+    align-items: flex-start;
+    gap: 20px;
     width: 100%;
-    max-width: 620px;
+    transform: translateY(-50px);
+}
+
+/* Like button to the right of the calculator */
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+}
+.like-label {
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+    text-transform: uppercase;
+}
+.like-btn .heart {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: #bbb;
+    transition: color 0.2s ease, transform 0.15s ease;
+    display: block;
+    text-decoration: none;
+    -webkit-text-decoration: none;
+}
+.like-btn.liked .heart {
+    color: #e25555;
+}
+.like-btn:active .heart {
+    transform: scale(0.88);
+}
+.like-btn .counter {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
 }
 
 /* Sidebar Theme Panel */
@@ -196,12 +241,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 1;
+    max-width: 1500px;
 }
 
+/* Calculator */
 .calculator {
-    width: 100%;
-    max-width: 380px;
+    width: 480px;
     background-color: var(--dark-navy);
     border-radius: var(--border-radius-main);
     padding: 24px;
@@ -413,12 +458,12 @@ body[data-theme="star-wars"] .btn-equals {
 
 /* Responsive adjustments for mobile and tablets */
 @media (max-width: 650px) {
-    .app-layout {
+    .main-wrapper {
         flex-direction: column;
         gap: 20px;
         max-width: 380px;
     }
-    
+
     .theme-panel {
         width: 100%;
         flex-direction: row;
@@ -427,17 +472,17 @@ body[data-theme="star-wars"] .btn-equals {
         padding: 14px 20px;
         gap: 10px;
     }
-    
+
     .theme-panel-title {
         margin-bottom: 0;
         text-align: left;
     }
-    
+
     .theme-options {
         flex-direction: row;
         gap: 10px;
     }
-    
+
     .theme-btn {
         padding: 8px 12px;
         font-size: 0.9rem;
@@ -476,3 +521,38 @@ body[data-theme="star-wars"] .btn-equals {
         font-size: 1.35rem;
     }
 }
+/* Footer styling */
+.footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 30px;
+}
+
+/* Social links container */
+.social-links {
+    display: flex;
+    gap: 24px; /* increased space between icons */
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.calculator-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto; /* prevent shrinking */
+}
+
+/* Icon size */
+.social-link img {
+    width: 40px;
+    height: 40px;
+    transition: transform 0.2s ease;
+}
+.social-link img:hover {
+    transform: scale(1.1);
+}
+
