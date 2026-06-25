@@ -314,7 +314,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (action === 'delete') {
                 calculator.delete();
             } else if (action === 'equals') {
+                const a = calculator.previousOperand, op = calculator.operation, b = calculator.currentOperand;
                 calculator.compute();
+                if (a && op && b && !calculator.isErrorState()) updateSWDialog(a, op, b, calculator.currentOperand);
             }
             calculator.updateDisplay();
         }
@@ -343,7 +345,9 @@ document.addEventListener('DOMContentLoaded', () => {
             selector = `button[data-number="${key}"]`;
         } else if (key === 'Enter' || key === '=') {
             e.preventDefault();
+            const a = calculator.previousOperand, op = calculator.operation, b = calculator.currentOperand;
             calculator.compute();
+            if (a && op && b && !calculator.isErrorState()) updateSWDialog(a, op, b, calculator.currentOperand);
             selector = '#btn-equals';
         } else if (key === 'Backspace') {
             calculator.delete();
@@ -374,6 +378,78 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    // Star Wars dialog characters
+    const SW_CHARS = [
+        {
+            name: 'Yoda',
+            avatar: '🧙',
+            idle: 'Hmm... waiting for your numbers, I am.',
+            speak(a, op, b, r) {
+                const ops = {'+': 'and', '-': 'minus', '*': 'times', '/': 'divided by'};
+                return `${numWord(a)} ${ops[op]||op} ${numWord(b)}, you combined. ${numWord(r)}, the answer is. Hmm.`;
+            }
+        },
+        {
+            name: 'Darth Vader',
+            avatar: '🦹',
+            idle: '*breathes heavily* ...Enter your numbers.',
+            speak(a, op, b, r) {
+                const ops = {'+':'plus','-':'minus','*':'times','/':'divided by'};
+                return `*breathes heavily* ${numWord(a)} ${ops[op]||op} ${numWord(b)}... The dark side reveals: ${numWord(r)}.`;
+            }
+        },
+        {
+            name: 'C-3PO',
+            avatar: '🤖',
+            idle: 'Oh my! I am ready to calculate at your command!',
+            speak(a, op, b, r) {
+                const ops = {'+':'plus','-':'minus','*':'multiplied by','/':'divided by'};
+                return `I have calculated! ${numWord(a)} ${ops[op]||op} ${numWord(b)} equals precisely ${numWord(r)}. The odds were 3,720 to one!`;
+            }
+        },
+        {
+            name: 'R2-D2',
+            avatar: '🤖',
+            idle: 'BWEE-WOO! *bloop* Ready, I am! DWEE-DOP!',
+            speak(a, op, b, r) {
+                return `BWEE-WOO! *bloop bloop* [${a} ${op} ${b} = ${r}] DWEE-DOP! *happy whistle*`;
+            }
+        },
+        {
+            name: 'Obi-Wan',
+            avatar: '🧔',
+            idle: 'Use the Force... and enter your calculation.',
+            speak(a, op, b, r) {
+                const ops = {'+':'added to','-':'taken from','*':'multiplied by','/':'divided by'};
+                return `Trust the Force. ${numWord(a)}, ${ops[op]||op} ${numWord(b)}, becomes ${numWord(r)}. And that is why you are here.`;
+            }
+        }
+    ];
+
+    const NUM_WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+    function numWord(n) {
+        const num = parseFloat(n);
+        if (Number.isInteger(num) && num >= 0 && num <= 20) return NUM_WORDS[num];
+        return String(n);
+    }
+
+    function updateSWDialog(a, op, b, result) {
+        if (document.body.getAttribute('data-theme') !== 'star-wars') return;
+        const char = SW_CHARS[Math.floor(Math.random() * SW_CHARS.length)];
+        document.getElementById('sw-char-name').textContent = char.name;
+        document.getElementById('sw-char-avatar').textContent = char.avatar;
+        document.getElementById('sw-dialog-text').textContent = char.speak(a, op, b, result);
+    }
+
+    function resetSWDialog() {
+        const char = SW_CHARS[Math.floor(Math.random() * SW_CHARS.length)];
+        document.getElementById('sw-char-name').textContent = char.name;
+        document.getElementById('sw-char-avatar').textContent = char.avatar;
+        document.getElementById('sw-dialog-text').textContent = char.idle;
+    }
+
+    resetSWDialog();
+
     // Shared like counter via countapi.xyz (localStorage fallback)
     const COUNTER_NS = 'priya-calculator-app';
     const COUNTER_KEY = 'heart-likes';

@@ -556,3 +556,72 @@ body[data-theme="star-wars"] .btn-equals {
     transform: scale(1.1);
 }
 
+/* Star Wars Dialog Box */
+.sw-dialog {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 190px;
+    flex-shrink: 0;
+}
+
+body[data-theme="star-wars"] .sw-dialog {
+    display: flex;
+}
+
+.sw-dialog-bubble {
+    background: rgba(12, 12, 12, 0.92);
+    border: 1px solid #ffe81f;
+    border-radius: 14px;
+    padding: 14px 16px;
+    position: relative;
+    box-shadow: 0 0 18px rgba(255, 232, 31, 0.2), inset 0 0 8px rgba(255, 232, 31, 0.04);
+    width: 100%;
+    min-height: 110px;
+}
+
+/* Arrow pointing left toward calculator */
+.sw-dialog-bubble::before {
+    content: '';
+    position: absolute;
+    left: -9px;
+    top: 18px;
+    border: 8px solid transparent;
+    border-right-color: #ffe81f;
+    border-left: 0;
+}
+
+.sw-dialog-bubble::after {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 19px;
+    border: 7px solid transparent;
+    border-right-color: #0c0c0c;
+    border-left: 0;
+}
+
+.sw-char-name {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #ffe81f;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.sw-dialog-text {
+    font-size: 0.85rem;
+    color: #e0e0e0;
+    line-height: 1.55;
+    margin: 0;
+    font-style: italic;
+}
+
+.sw-char-avatar {
+    font-size: 2rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(255, 232, 31, 0.5));
+}
